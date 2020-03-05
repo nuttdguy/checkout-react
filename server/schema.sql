@@ -22,7 +22,12 @@ CREATE TABLE Addresses (
     line_2 VARCHAR(40),
     city VARCHAR(40),
     states VARCHAR(40),
-    zip_code VARCHAR(40)
+    zip_code VARCHAR(40),
+    users_id INT,
+    CONSTRAINT FOREIGN KEY users_id_FK (users_id) 
+    REFERENCES Users (users_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Payments (
@@ -30,5 +35,10 @@ CREATE TABLE Payments (
     credit_card_number VARCHAR(20),
     expiry_date VARCHAR(16),
     ccv VARCHAR(16),
-    billing_zip_code VARCHAR(16)
+    billing_zip_code VARCHAR(16),
+    users_id INT,
+    CONSTRAINT FOREIGN KEY users_id_FK (users_id)
+    REFERENCES Users (users_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );

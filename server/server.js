@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 
 const mySql = require('mysql');
-const connection = mySql.createConnection({
-    user: 'student',
-    password: 'student',
-    database: 'Checkout',
-    port: '3306'
-});
+// const connection = mySql.createConnection({
+//     user: 'student',
+//     password: 'student',
+//     database: 'Checkout',
+//     port: '3306'
+// });
 
 
 const UserModel = (data) => {
@@ -49,11 +49,11 @@ app.use((req, res, next) => {
 
 
 app.post('/', (req, res, next) => {
-    // console.log('body=', req.body);
     const data = req.body;
     const user = UserModel(data);
     const address = AddressModel(data.address);
     const payment = PaymentsModel(data.payment);
+
 
     const connection = openConnection(); // open a connection
 
@@ -62,7 +62,7 @@ app.post('/', (req, res, next) => {
             throw error;
         }
         // users table
-        var query = connection.query('INSERT INTO Users SET ?', user, (error, results, fields) => {
+        connection.query('INSERT INTO Users SET ?', user, (error, userResult, fields) => {
             if (error) {
                 return connection.rollback(() => {
                     console.log('ERROR => insert payments=', error)
@@ -70,10 +70,10 @@ app.post('/', (req, res, next) => {
                 });
             };
 
-            console.log('insert user query=', query.sql)
-            console.log('insert user=', results, fields)
             // addresses table
-            query = connection.query('INSERT INTO Addresses SET ?', address, (error, results, fields) => {
+            console.log(userResult)
+            address.users_id = userResult.insertId;
+            connection.query('INSERT INTO Addresses SET ?', address, (error, results, fields) => {
                 if (error) {
                     return connection.rollback(() => {
                         console.log('ERROR => insert payments=', error)
@@ -82,10 +82,9 @@ app.post('/', (req, res, next) => {
                 };
 
 
-                console.log('insert address query=', query.sql)
-                console.log('insert address=', results, fields)
                 // payments table
-                query = connection.query('INSERT INTO Payments SET ?', payment, (error, results, fileds) => {
+                payment.users_id = userResult.insertId;
+                connection.query('INSERT INTO Payments SET ?', payment, (error, results, fileds) => {
                     if (error) {
                         return connection.rollback(() => {
                             console.log('ERROR => insert payments=', error)
@@ -93,12 +92,18 @@ app.post('/', (req, res, next) => {
                         });
                     };
 
-                    console.log('insert user payments=', query.sql)
-                    console.log('insert payments=', results, fields)
-                    console.log('transaction was successful!')
+                    connection.commit( (error) => {
+                        if (error) {
+                            return connection.rollback(() => {
+                                console.log('ERROR => commit=', error)
+                                throw error;
+                            });
+                        };
 
-                    res.send(results);
-                    closeConnection(connection, next);
+                        res.send(results);
+                        closeConnection(connection, next);
+                        console.log('transaction was successful!')
+                    })
 
                 })
 
@@ -121,13 +126,13 @@ app.get('/users', (req, res, next) => {
             throw error;
         }
 
-        var query = connection.query('SELECT users_id, username, email FROM Users', (error, results, fields) => {
+        connection.query('SELECT users_id, username, email FROM Users', (error, results, fields) => {
             if (error) {
                 console.log(error);
                 throw error;
             };
 
-            res.send(results[0]);
+            res.send(results);
             closeConnection(connection, next);
 
         })
@@ -135,6 +140,7 @@ app.get('/users', (req, res, next) => {
     })
 
 })
+
 
 var openConnection = function() {
     return mySql.createConnection({
@@ -145,6 +151,7 @@ var openConnection = function() {
     });
 
 }
+
 
 var closeConnection = function(connection, next) {
     connection.end((err) => {
