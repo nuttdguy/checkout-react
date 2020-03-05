@@ -1,0 +1,27 @@
+{
+  "name": "checkout-react",
+  "version": "1.0.0",
+  "description": "Front end checkout built utilzing React Library",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "live-server",
+    "build": "babel . --out-dir compiled --presets=react --ignore=node_modules,compiled --source-maps inline -w"
+  },
+  "author": "Phouthalang Pygnasak",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-react": "^1.0.0",
+    "babel-preset-react": "^6.24.1"
+  },
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.15",
+    "popper": "^1.0.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  }
+}
