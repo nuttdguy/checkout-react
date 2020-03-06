@@ -1,13 +1,6 @@
 const express = require('express');
 const app = express();
-
 const mySql = require('mysql');
-// const connection = mySql.createConnection({
-//     user: 'student',
-//     password: 'student',
-//     database: 'Checkout',
-//     port: '3306'
-// });
 
 
 const UserModel = (data) => {
@@ -71,7 +64,7 @@ app.post('/', (req, res, next) => {
             };
 
             // addresses table
-            console.log(userResult)
+            // console.log(userResult)
             address.users_id = userResult.insertId;
             connection.query('INSERT INTO Addresses SET ?', address, (error, results, fields) => {
                 if (error) {
@@ -140,6 +133,118 @@ app.get('/users', (req, res, next) => {
     })
 
 })
+
+
+app.get('/users/info', (req, res, next) => {
+
+    const connection = openConnection();
+
+    connection.beginTransaction(error => {
+        if (error) {
+            throw error;
+        }
+
+        const query = `
+            SELECT a.username, a.email, a.password, 
+                b.line_1, b.line_2, b.city, b.states, b.zip_code
+            FROM Users AS a 
+            INNER JOIN Addresses AS b ON b.users_id = a.users_id
+            INNER JOIN Payments AS c ON c.users_id = a.users_id`;
+
+        connection.query(query, (error, queryResult, fields) => {
+            if (error) {
+                throw error;
+            }
+
+            connection.commit((error) => {
+                if (error) {
+                    throw error;
+                }
+
+                res.send(queryResult);
+                closeConnection(connection, next);
+            })
+
+        })
+
+    })
+
+})
+
+
+app.get('/users/payment', (req, res, next) => {
+
+    const connection = openConnection();
+
+    connection.beginTransaction(error => {
+        if (error) {
+            throw error;
+        }
+
+        const query = `
+            SELECT a.username, a.email, 
+                c.credit_card_number, c.expiry_date, c.ccv, c.billing_zip_code
+            FROM Users AS a 
+            INNER JOIN Payments AS c ON c.users_id = a.users_id`;
+
+        connection.query(query, (error, queryResult, fields) => {
+            if (error) {
+                throw error;
+            }
+
+            connection.commit((error) => {
+                if (error) {
+                    throw error;
+                }
+
+                res.send(queryResult);
+                closeConnection(connection, next);
+            })
+
+        })
+
+    })
+
+})
+
+
+app.get('/users/payment/count', (req, res, next) => {
+
+    const connection = openConnection();
+
+    connection.beginTransaction(error => {
+        if (error) {
+            throw error;
+        }
+
+        const query = `
+            SELECT 
+               (SELECT COUNT(c.credit_card_number) FROM Payments AS c) as PaymentAccounts,
+                a.username, a.email
+            FROM Users AS a 
+            INNER JOIN Payments AS c ON c.users_id = a.users_id`;
+
+        connection.query(query, (error, queryResult, fields) => {
+            if (error) {
+                throw error;
+            }
+
+            connection.commit((error) => {
+                if (error) {
+                    throw error;
+                }
+
+                res.send(queryResult);
+                closeConnection(connection, next);
+            })
+
+        })
+
+    })
+
+})
+
+
 
 
 var openConnection = function() {

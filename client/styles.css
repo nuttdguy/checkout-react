@@ -1,0 +1,12 @@
+input {
+    display: block;
+}
+
+.form {
+    display: inline-block;
+}
+
+.input {
+    display: block;
+    height: 180px;
+}

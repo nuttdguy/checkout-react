@@ -141,7 +141,7 @@ class CheckoutForm extends React.Component {
 
     submitForm() {
         var data = Object.assign({}, this.state);
-        console.log(data);
+        // console.log(data);
         $.ajax({
             url: 'http://127.0.0.1:3000/',
             type: 'POST',
@@ -160,6 +160,7 @@ class CheckoutForm extends React.Component {
     ////////////////////////////////////////////////
     // TEMPLATES
     intakeFormTemplate(name, email, new_password) {
+
         
         return (
             <form className='form form-intake'>
@@ -237,7 +238,7 @@ class CheckoutForm extends React.Component {
                     onInputChangeHandler={this.onInputChangeHandler}
                 />
                 <InputField 
-                    label={'city'}
+                    label={'zip_code'}
                     data={'js-address_zip_code'}
                     type={"text"}
                     inputValue={zip_code}
@@ -323,8 +324,6 @@ class CheckoutForm extends React.Component {
             card_number, expiry_date, ccv, billing_zip_code,
             checkoutStep } = this.state;
 
-            // console.log('checkout step=', checkoutStep)
-
         return (
             <div> 
                 { checkoutStep === 1 ? this.intakeFormTemplate(name, email, new_password) : null }
@@ -339,7 +338,7 @@ class CheckoutForm extends React.Component {
 
 
 const InputField = (props) => (
-    <React.Fragment>
+    <div className="input input-container">
         <label>{props.label}</label>
         <input  type={props.type}
                 data={props.data}
@@ -347,17 +346,17 @@ const InputField = (props) => (
                 className={props.style}
                 placeholder={props.placeholder}
                 onChange={props.onInputChangeHandler} />
-    </React.Fragment>)
+    </div>)
 
 const Button = (props) => (
-    <React.Fragment>
+    <div>
         <button onClick={props.onClickHandler}
                 className={props.style}
                 type={props.type}
                 data={props.data} >
             {props.buttonText}
         </button>
-    </React.Fragment>
+    </div>
 )
 
 
